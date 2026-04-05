@@ -9,7 +9,21 @@
 <meta name="theme-color" content="#302b63">
 <title>Bible — Parole du Jour</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icon.svg">
+<script>
+// Génère l'icône via canvas pour apple-touch-icon (iOS)
+(function(){
+  var c=document.createElement('canvas');c.width=512;c.height=512;
+  var ctx=c.getContext('2d');
+  ctx.fillStyle='#000000';
+  ctx.beginPath();ctx.roundRect(0,0,512,512,112);ctx.fill();
+  ctx.fillStyle='#FCF876';
+  ctx.beginPath();ctx.roundRect(232,96,48,320,12);ctx.fill();
+  ctx.beginPath();ctx.roundRect(112,196,288,48,12);ctx.fill();
+  var link=document.querySelector("link[rel='apple-touch-icon']");
+  if(link)link.href=c.toDataURL('image/png');
+})();
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
