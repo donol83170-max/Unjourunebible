@@ -1,6 +1,6 @@
 {
-  "name": "Bible — Parole du Jour",
-  "short_name": "Bible",
+  "name": "Un jour, un verset",
+  "short_name": "Un jour, un verset",
   "description": "Un verset biblique chaque jour",
   "start_url": "/",
   "display": "standalone",
