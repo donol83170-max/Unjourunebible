@@ -15,7 +15,7 @@
 (function(){
   var c=document.createElement('canvas');c.width=512;c.height=512;
   var ctx=c.getContext('2d');
-  ctx.fillStyle='#000000';
+  ctx.fillStyle='#3797A4';
   ctx.beginPath();ctx.roundRect(0,0,512,512,112);ctx.fill();
   ctx.fillStyle='#FCF876';
   ctx.beginPath();ctx.roundRect(232,96,48,320,12);ctx.fill();
@@ -202,6 +202,33 @@ body::before{
 .confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99;overflow:hidden}
 .confetti-piece{position:absolute;animation:confettiFall linear forwards}
 
+/* Bannière notification */
+.notif-banner{
+  width:100%;background:#fff;
+  border:1.5px solid rgba(155,205,205,0.4);
+  border-radius:16px;padding:16px 18px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 4px 16px rgba(55,151,164,0.08);
+  animation:fadeUp .6s ease;
+}
+.notif-banner-text{flex:1;font-family:sans-serif;font-size:.82rem;color:#1a3a3c;line-height:1.4}
+.notif-banner-text strong{color:#3797A4;display:block;margin-bottom:2px}
+.notif-banner-btn{
+  background:#3797A4;color:#fff;border:none;
+  border-radius:10px;padding:8px 14px;
+  font-size:.8rem;font-weight:700;font-family:sans-serif;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+}
+.notif-time-wrap{
+  display:flex;align-items:center;gap:8px;margin-top:8px;
+}
+.notif-time-wrap label{font-family:sans-serif;font-size:.78rem;color:#5a8a8c}
+.notif-time-wrap input[type=time]{
+  border:1px solid rgba(155,205,205,0.5);border-radius:8px;
+  padding:4px 8px;font-size:.82rem;color:#1a3a3c;
+  background:#fff;font-family:sans-serif;
+}
+
 /* Tutoriel installation */
 .tuto-steps{display:flex;flex-direction:column;gap:14px;margin:16px 0}
 .tuto-step{display:flex;align-items:center;gap:14px;background:rgba(55,151,164,0.05);border:1px solid rgba(155,205,205,0.3);border-radius:14px;padding:14px 16px}
@@ -272,6 +299,20 @@ body::before{
   <div class="header">
     <div class="header-label">✦ Parole du jour ✦</div>
     <div class="header-date" id="headerDate"></div>
+  </div>
+
+  <!-- Bannière rappel (masquée par défaut) -->
+  <div id="notifBanner" class="notif-banner" style="display:none">
+    <div style="font-size:22px">🔔</div>
+    <div class="notif-banner-text">
+      <strong>Rappel quotidien</strong>
+      Recevez une notification chaque matin.
+      <div class="notif-time-wrap">
+        <label>Heure :</label>
+        <input type="time" id="notifTime" value="07:00">
+      </div>
+    </div>
+    <button class="notif-banner-btn" onclick="enableNotifications()">Activer</button>
   </div>
 
   <!-- Vue lecture -->
@@ -517,7 +558,14 @@ function showSuccess(verse) {
 }
 
 function validate() {
-  localStorage.setItem(STORAGE_KEY, getToday());
+  const today = getToday();
+  localStorage.setItem(STORAGE_KEY, today);
+  // Informe le SW que la lecture est faite (pas de notif aujourd'hui)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.active && reg.active.postMessage({ type: 'MARK_READ', date: today });
+    });
+  }
   launchConfetti();
   showSuccess(VERSES[getVerseIndex()]);
 }
@@ -534,6 +582,55 @@ function init() {
   document.getElementById('footerCount').textContent = VERSES.length + ' versets \u00b7 un nouveau chaque jour';
 
   if (isReadToday()) showSuccess(verse);
+  initNotifications();
+}
+
+/* ── Notifications ── */
+async function initNotifications() {
+  if (!('Notification' in window)) return;
+  const perm = Notification.permission;
+  if (perm === 'default') {
+    // Affiche la bannière pour proposer l'activation
+    document.getElementById('notifBanner').style.display = 'flex';
+  } else if (perm === 'granted') {
+    // Déjà activé — on envoie l'heure sauvegardée au SW
+    const savedTime = localStorage.getItem('notif_time') || '07:00';
+    document.getElementById('notifTime').value = savedTime;
+    sendTimeToSW(savedTime);
+  }
+}
+
+async function enableNotifications() {
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    const time = document.getElementById('notifTime').value || '07:00';
+    localStorage.setItem('notif_time', time);
+    sendTimeToSW(time);
+    document.getElementById('notifBanner').style.display = 'none';
+    showToast('Rappel activé à ' + time + ' ✓');
+  } else {
+    showToast('Permission refusée — activez les notifications dans les réglages.');
+  }
+}
+
+function sendTimeToSW(time) {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.active && reg.active.postMessage({ type: 'SET_NOTIF_TIME', time });
+      // Periodic background sync (Android Chrome)
+      if ('periodicSync' in reg) {
+        reg.periodicSync.register('daily-verse', { minInterval: 12 * 60 * 60 * 1000 }).catch(() => {});
+      }
+    });
+  }
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#3797A4;color:#fff;padding:10px 20px;border-radius:20px;font-family:sans-serif;font-size:.82rem;font-weight:600;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(55,151,164,0.3)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
 if ('serviceWorker' in navigator) {
