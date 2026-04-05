@@ -78,6 +78,9 @@ body::after{background-image:radial-gradient(1px 1px at 70% 40%,rgba(255,255,255
     <p>Ouvrez <code>status.html</code> pour obtenir un JSON :</p>
     <p><code>{"isRead": true, "date": "2026-04-05"}</code></p>
     <p>Configurez une automatisation : <em>Quand vous ouvrez une app → Si isRead est false → Ouvrir Bible First</em></p>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:16px 0">
+    <p style="color:rgba(255,255,255,0.5);font-size:.82rem;margin-bottom:8px">Vous commencez actuellement depuis le <strong style="color:var(--gold)" id="startDateDisplay"></strong>. Verset en cours : <strong style="color:var(--gold)" id="currentDayDisplay"></strong>/40.</p>
+    <button class="modal-close" style="background:rgba(255,59,48,0.15);border-color:rgba(255,59,48,0.3);color:#FF3B30;margin-bottom:8px" onclick="resetStartDate()">Recommencer depuis le Verset 1 aujourd'hui</button>
     <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">Fermer</button>
   </div>
 </div>
@@ -85,7 +88,7 @@ body::after{background-image:radial-gradient(1px 1px at 70% 40%,rgba(255,255,255
 <div class="app" id="mainApp">
   <div class="header">
     <div class="header-title">Bible <span>First</span></div>
-    <button class="btn-help" onclick="document.getElementById('modalOverlay').classList.add('open')" aria-label="Aide">?</button>
+    <button class="btn-help" onclick="openHelp()" aria-label="Aide">?</button>
   </div>
 
   <div id="dayBadge" class="day-badge">Jour 1 · Verset 1/40</div>
@@ -157,20 +160,44 @@ const VERSES = [
   {ref:"Ephésiens 6:10",text:"Au reste, fortifiez-vous dans le Seigneur, et par sa force toute-puissante."}
 ];
 
-const STORAGE_KEY = 'bible_read_date';
-const START_DATE   = new Date('2026-01-01');
+const STORAGE_KEY      = 'bible_read_date';
+const START_DATE_KEY   = 'bible_start_date';
 
 function getToday() {
   return new Date().toISOString().split('T')[0];
 }
 
+function getStartDate() {
+  let d = localStorage.getItem(START_DATE_KEY);
+  if (!d) {
+    d = getToday();
+    localStorage.setItem(START_DATE_KEY, d);
+  }
+  return d;
+}
+
 function getDayIndex() {
-  const diff = Math.floor((Date.now() - START_DATE.getTime()) / 86400000);
+  const start = new Date(getStartDate());
+  const diff  = Math.floor((Date.now() - start.getTime()) / 86400000);
   return ((diff % VERSES.length) + VERSES.length) % VERSES.length;
+}
+
+function getDayNum() {
+  const start = new Date(getStartDate());
+  const diff  = Math.floor((Date.now() - start.getTime()) / 86400000);
+  return (diff % VERSES.length) + 1;
 }
 
 function isReadToday() {
   return localStorage.getItem(STORAGE_KEY) === getToday();
+}
+
+function resetStartDate() {
+  if (confirm('Recommencer depuis le Verset 1 aujourd\'hui ?')) {
+    localStorage.setItem(START_DATE_KEY, getToday());
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
 }
 
 function launchConfetti() {
@@ -210,20 +237,27 @@ function validate() {
 }
 
 function init() {
-  const idx = getDayIndex();
-  const verse = VERSES[idx];
-  const dayNum = ((Math.floor((Date.now() - START_DATE.getTime()) / 86400000)) % VERSES.length) + 1;
+  getStartDate(); // initialise la date de départ si premier lancement
+  const idx     = getDayIndex();
+  const verse   = VERSES[idx];
+  const dayNum  = getDayNum();
   const progress = Math.round((dayNum / VERSES.length) * 100);
 
-  document.getElementById('verseRef').textContent = verse.ref;
+  document.getElementById('verseRef').textContent  = verse.ref;
   document.getElementById('verseText').textContent = '"' + verse.text + '"';
-  document.getElementById('dayBadge').textContent = 'Jour ' + dayNum + ' · Verset ' + dayNum + '/40';
+  document.getElementById('dayBadge').textContent  = 'Jour ' + dayNum + ' · Verset ' + dayNum + '/40';
   document.getElementById('progressFill').style.width = progress + '%';
   document.getElementById('progressLabel').textContent = dayNum + '/40';
 
   if (isReadToday()) {
     showSuccess(verse);
   }
+}
+
+function openHelp() {
+  document.getElementById('startDateDisplay').textContent = getStartDate();
+  document.getElementById('currentDayDisplay').textContent = getDayNum();
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
 if ('serviceWorker' in navigator) {
