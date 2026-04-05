@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0D0D1A">
+<title>Bible First</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#F5A623;--gold2:#e8941f;--bg1:#0D0D1A;--bg2:#1a1a2e;--bg3:#16213e;--white:rgba(255,255,255,0.92);--dim:rgba(255,255,255,0.5)}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%) fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top,20px) env(safe-area-inset-right,20px) env(safe-area-inset-bottom,20px) env(safe-area-inset-left,20px)}
+/* Stars */
+body::before,body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0}
+body::before{background-image:radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,0.6) 0%,transparent 100%),radial-gradient(1px 1px at 80% 10%,rgba(255,255,255,0.4) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 40% 70%,rgba(255,255,255,0.5) 0%,transparent 100%),radial-gradient(1px 1px at 60% 50%,rgba(255,255,255,0.3) 0%,transparent 100%),radial-gradient(1px 1px at 10% 80%,rgba(255,255,255,0.4) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 90% 60%,rgba(255,255,255,0.5) 0%,transparent 100%),radial-gradient(1px 1px at 55% 20%,rgba(255,255,255,0.3) 0%,transparent 100%),radial-gradient(1px 1px at 30% 55%,rgba(255,255,255,0.4) 0%,transparent 100%);animation:twinkle1 4s ease-in-out infinite alternate}
+body::after{background-image:radial-gradient(1px 1px at 70% 40%,rgba(255,255,255,0.5) 0%,transparent 100%),radial-gradient(1px 1px at 15% 15%,rgba(255,255,255,0.3) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 85% 85%,rgba(255,255,255,0.6) 0%,transparent 100%),radial-gradient(1px 1px at 45% 90%,rgba(255,255,255,0.4) 0%,transparent 100%),radial-gradient(1px 1px at 75% 25%,rgba(255,255,255,0.3) 0%,transparent 100%);animation:twinkle2 6s ease-in-out infinite alternate}
+@keyframes twinkle1{0%{opacity:.7}100%{opacity:1}}
+@keyframes twinkle2{0%{opacity:.5}100%{opacity:.9}}
+/* Layout */
+.app{position:relative;z-index:1;width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;padding:0 4px}
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+.header-title{font-size:1.1rem;font-weight:700;color:var(--white);letter-spacing:.5px}
+.header-title span{color:var(--gold)}
+.btn-help{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:var(--dim);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.btn-help:hover{background:rgba(255,255,255,0.15);color:var(--white)}
+/* Day badge */
+.day-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.25);border-radius:20px;padding:5px 12px;font-size:.72rem;font-weight:600;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;align-self:flex-start}
+/* Card */
+.card{background:rgba(255,255,255,0.04);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.09);border-radius:24px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08)}
+.card-ref{font-size:.78rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.card-verse{font-size:1.05rem;line-height:1.85;color:var(--white);font-style:italic;font-weight:300}
+/* Progress */
+.progress-wrap{display:flex;align-items:center;gap:10px}
+.progress-bar-bg{flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width .8s ease}
+.progress-label{font-size:.7rem;color:var(--dim);white-space:nowrap}
+/* Button */
+.btn-validate{width:100%;padding:18px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0D0D1A;border:none;border-radius:14px;font-size:1rem;font-weight:700;letter-spacing:.3px;cursor:pointer;box-shadow:0 8px 32px rgba(245,166,35,0.3),0 2px 8px rgba(245,166,35,0.2);transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.btn-validate:active{transform:scale(0.97);box-shadow:0 4px 16px rgba(245,166,35,0.2)}
+/* Success screen */
+.success-screen{display:none;flex-direction:column;align-items:center;gap:16px;text-align:center;animation:fadeUp .5s ease}
+.success-icon{width:72px;height:72px;background:linear-gradient(135deg,#34c759,#28a745);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 8px 32px rgba(52,199,89,0.35);animation:popIn .5s cubic-bezier(0.34,1.56,0.64,1)}
+.success-title{font-size:1.5rem;font-weight:700;color:var(--white)}
+.success-sub{font-size:.9rem;color:var(--dim);line-height:1.5}
+.success-verse-ref{font-size:.8rem;font-weight:600;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase}
+.success-verse-text{font-size:.95rem;font-style:italic;color:var(--dim);line-height:1.7;max-width:320px}
+/* Confetti */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99;overflow:hidden}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:20px;animation:fadeIn .25s ease}
+.modal-overlay.open{display:flex}
+.modal{background:#1c1c2e;border:1px solid rgba(255,255,255,0.1);border-radius:24px 24px 20px 20px;padding:28px 24px 36px;width:100%;max-width:420px;color:var(--white)}
+.modal h3{font-size:1.1rem;font-weight:700;margin-bottom:16px;color:var(--gold)}
+.modal p{font-size:.88rem;line-height:1.65;color:rgba(255,255,255,0.75);margin-bottom:12px}
+.modal code{background:rgba(255,255,255,0.08);border-radius:6px;padding:2px 7px;font-size:.82rem;color:var(--gold)}
+.modal-close{width:100%;padding:14px;margin-top:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--white);font-size:.95rem;cursor:pointer}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+/* Read view card update */
+.read-view .card{border-color:rgba(52,199,89,0.25);background:rgba(52,199,89,0.04)}
+</style>
+</head>
+<body>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <h3>Intégration Raccourcis iOS</h3>
+    <p>Cette app peut être interrogée via l'action <strong>"Obtenir le contenu d'une URL"</strong> dans les Raccourcis iOS.</p>
+    <p>Ouvrez <code>status.html</code> pour obtenir un JSON :</p>
+    <p><code>{"isRead": true, "date": "2026-04-05"}</code></p>
+    <p>Configurez une automatisation : <em>Quand vous ouvrez une app → Si isRead est false → Ouvrir Bible First</em></p>
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">Fermer</button>
+  </div>
+</div>
+
+<div class="app" id="mainApp">
+  <div class="header">
+    <div class="header-title">Bible <span>First</span></div>
+    <button class="btn-help" onclick="document.getElementById('modalOverlay').classList.add('open')" aria-label="Aide">?</button>
+  </div>
+
+  <div id="dayBadge" class="day-badge">Jour 1 · Verset 1/40</div>
+
+  <!-- Read view -->
+  <div id="readView">
+    <div class="card">
+      <div class="card-ref" id="verseRef">Jean 3:16</div>
+      <div class="card-verse" id="verseText">Chargement...</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">0/40</div>
+    </div>
+    <button class="btn-validate" id="btnValidate" onclick="validate()">J'ai lu ce verset ✓</button>
+  </div>
+
+  <!-- Success view -->
+  <div class="success-screen" id="successView">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Lecture validée !</div>
+    <div class="success-sub">Vous avez lu la Parole de Dieu aujourd'hui.<br>Revenez demain pour le verset suivant.</div>
+    <div class="success-verse-ref" id="successRef"></div>
+    <div class="success-verse-text" id="successVerse"></div>
+  </div>
+</div>
+
+<script>
+const VERSES = [
+  {ref:"Jean 3:16",text:"Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse pas, mais ait la vie éternelle."},
+  {ref:"Psaume 23:1",text:"L'Éternel est mon berger : je ne manquerai de rien."},
+  {ref:"Proverbes 3:5-6",text:"Confie-toi en l'Éternel de tout ton cœur, et ne t'appuie pas sur ta sagesse. Reconnais-le dans toutes tes voies, et il aplanira tes sentiers."},
+  {ref:"Philippiens 4:13",text:"Je puis tout par celui qui me fortifie."},
+  {ref:"Romains 8:28",text:"Nous savons, du reste, que toutes choses concourent au bien de ceux qui aiment Dieu, de ceux qui sont appelés selon son dessein."},
+  {ref:"Matthieu 6:33",text:"Cherchez premièrement le royaume et la justice de Dieu ; et toutes ces choses vous seront données par-dessus."},
+  {ref:"Esaïe 40:31",text:"Mais ceux qui se confient en l'Éternel renouvellent leur force. Ils prennent le vol comme les aigles ; ils courent, et ne se lassent pas ; ils marchent, et ne se fatiguent pas."},
+  {ref:"Josué 1:9",text:"N'ai-je pas eu l'ordre de te fortifier et de t'encourager ? Ne t'effraie point et ne t'épouvante point, car l'Éternel, ton Dieu, est avec toi dans tout ce que tu entreprendras."},
+  {ref:"Jérémie 29:11",text:"Car je connais les projets que j'ai formés sur vous, dit l'Éternel, projets de paix et non de malheur, afin de vous donner un avenir et de l'espérance."},
+  {ref:"1 Corinthiens 13:4-7",text:"L'amour est patient, il est plein de bonté ; l'amour n'est point envieux ; l'amour ne se vante point, il ne s'enfle point d'orgueil… il supporte tout, il croit tout, il espère tout, il endure tout."},
+  {ref:"Psaume 46:2",text:"Dieu est pour nous un refuge et un appui, un secours qui ne fait point défaut dans la détresse."},
+  {ref:"Matthieu 11:28",text:"Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos."},
+  {ref:"Galates 5:22-23",text:"Mais le fruit de l'Esprit, c'est l'amour, la joie, la paix, la patience, la bonté, la bienveillance, la fidélité, la douceur, la tempérance."},
+  {ref:"Ephésiens 2:8-9",text:"Car c'est par la grâce que vous êtes sauvés, par le moyen de la foi. Et cela ne vient pas de vous, c'est le don de Dieu. Ce n'est point par les œuvres, afin que personne ne se glorifie."},
+  {ref:"2 Timothée 1:7",text:"Car ce n'est pas un esprit de timidité que Dieu nous a donné, mais un esprit de force, d'amour et de sagesse."},
+  {ref:"Psaume 119:105",text:"Ta parole est une lampe à mes pieds, et une lumière sur mon sentier."},
+  {ref:"Lamentations 3:22-23",text:"Les bontés de l'Éternel ne sont pas épuisées, ses compassions ne sont pas à leur terme ; elles se renouvellent chaque matin. Ta fidélité est grande !"},
+  {ref:"Deutéronome 31:6",text:"Fortifiez-vous et ayez du courage ! Ne craignez pas et ne soyez pas effrayés devant eux, car l'Éternel, ton Dieu, marche avec toi ; il ne te délaissera pas et ne t'abandonnera pas."},
+  {ref:"Luc 1:37",text:"Car rien n'est impossible à Dieu."},
+  {ref:"Actes 1:8",text:"Mais vous recevrez une puissance, le Saint-Esprit survenant sur vous, et vous serez mes témoins… jusqu'aux extrémités de la terre."},
+  {ref:"Romains 12:2",text:"Ne vous conformez pas au siècle présent, mais soyez transformés par le renouvellement de l'intelligence, afin que vous discerniez quelle est la volonté de Dieu, ce qui est bon, agréable et parfait."},
+  {ref:"Jacques 1:2-3",text:"Mes frères, regardez comme un sujet de joie complète les diverses épreuves auxquelles vous pouvez vous trouver exposés, sachant que l'épreuve de votre foi produit la patience."},
+  {ref:"1 Pierre 5:7",text:"Déchargez-vous sur lui de tous vos soucis, car lui-même prend soin de vous."},
+  {ref:"Hébreux 11:1",text:"Or la foi, c'est la certitude des choses qu'on espère, la démonstration de celles qu'on ne voit pas."},
+  {ref:"Apocalypse 21:4",text:"Il essuiera toute larme de leurs yeux, et la mort ne sera plus, et il n'y aura plus ni deuil, ni cri, ni douleur, car les premières choses ont disparu."},
+  {ref:"Matthieu 5:14",text:"Vous êtes la lumière du monde. Une ville située sur une montagne ne peut être cachée."},
+  {ref:"Jean 14:6",text:"Jésus lui dit : Je suis le chemin, la vérité, et la vie. Nul ne vient au Père que par moi."},
+  {ref:"1 Jean 4:19",text:"Pour nous, nous l'aimons, parce qu'il nous a aimés le premier."},
+  {ref:"Psaume 27:1",text:"L'Éternel est ma lumière et mon salut : de qui aurais-je crainte ? L'Éternel est le soutien de ma vie : de qui aurais-je peur ?"},
+  {ref:"Romains 6:23",text:"Car le salaire du péché, c'est la mort ; mais le don gratuit de Dieu, c'est la vie éternelle en Jésus-Christ notre Seigneur."},
+  {ref:"Colossiens 3:23",text:"Quoi que vous fassiez, faites-le de bon cœur, comme pour le Seigneur et non pour des hommes."},
+  {ref:"2 Chroniques 7:14",text:"Si mon peuple sur qui est invoqué mon nom s'humilie, prie, et cherche ma face, et s'il se détourne de ses mauvaises voies, je l'exaucerai des cieux, je lui pardonnerai son péché, et je guérirai son pays."},
+  {ref:"Esaïe 41:10",text:"Ne crains rien, car je suis avec toi ; ne promène pas des regards inquiets, car je suis ton Dieu ; je te fortifie, je viens à ton secours, je te soutiens de ma droite triomphante."},
+  {ref:"Matthieu 28:19-20",text:"Allez, faites de toutes les nations des disciples… et voici, je suis avec vous tous les jours, jusqu'à la fin du monde."},
+  {ref:"Jean 10:10",text:"Le voleur ne vient que pour dérober, égorger et détruire ; moi, je suis venu afin que les brebis aient la vie, et qu'elles soient dans l'abondance."},
+  {ref:"Psaume 37:4",text:"Fais de l'Éternel tes délices, et il te donnera ce que ton cœur désire."},
+  {ref:"Proverbes 22:6",text:"Instruis l'enfant selon la voie qu'il doit suivre ; et quand il sera vieux, il ne s'en détournera pas."},
+  {ref:"1 Jean 1:9",text:"Si nous confessons nos péchés, il est fidèle et juste pour nous les pardonner, et pour nous purifier de toute iniquité."},
+  {ref:"Romains 5:8",text:"Mais Dieu prouve son amour envers nous, en ce que, lorsque nous étions encore des pécheurs, Christ est mort pour nous."},
+  {ref:"Ephésiens 6:10",text:"Au reste, fortifiez-vous dans le Seigneur, et par sa force toute-puissante."}
+];
+
+const STORAGE_KEY = 'bible_read_date';
+const START_DATE   = new Date('2026-01-01');
+
+function getToday() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function getDayIndex() {
+  const diff = Math.floor((Date.now() - START_DATE.getTime()) / 86400000);
+  return ((diff % VERSES.length) + VERSES.length) % VERSES.length;
+}
+
+function isReadToday() {
+  return localStorage.getItem(STORAGE_KEY) === getToday();
+}
+
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#F5A623','#34c759','#007AFF','#FF375F','#AF52DE','#5AC8FA','#FFD60A','#FF9F0A'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = [
+      'left:' + Math.random() * 100 + '%',
+      'background:' + colors[Math.floor(Math.random() * colors.length)],
+      'animation-duration:' + (1.5 + Math.random() * 2) + 's',
+      'animation-delay:' + (Math.random() * 0.6) + 's',
+      'width:' + (6 + Math.random() * 6) + 'px',
+      'height:' + (6 + Math.random() * 6) + 'px',
+      'border-radius:' + (Math.random() > 0.5 ? '50%' : '2px')
+    ].join(';');
+    container.appendChild(el);
+  }
+  setTimeout(() => container.innerHTML = '', 4000);
+}
+
+function showSuccess(verse) {
+  document.getElementById('readView').style.display = 'none';
+  const sv = document.getElementById('successView');
+  sv.style.display = 'flex';
+  document.getElementById('successRef').textContent = verse.ref;
+  document.getElementById('successVerse').textContent = '"' + verse.text + '"';
+  document.getElementById('mainApp').classList.add('read-view');
+}
+
+function validate() {
+  localStorage.setItem(STORAGE_KEY, getToday());
+  const idx = getDayIndex();
+  launchConfetti();
+  showSuccess(VERSES[idx]);
+}
+
+function init() {
+  const idx = getDayIndex();
+  const verse = VERSES[idx];
+  const dayNum = ((Math.floor((Date.now() - START_DATE.getTime()) / 86400000)) % VERSES.length) + 1;
+  const progress = Math.round((dayNum / VERSES.length) * 100);
+
+  document.getElementById('verseRef').textContent = verse.ref;
+  document.getElementById('verseText').textContent = '"' + verse.text + '"';
+  document.getElementById('dayBadge').textContent = 'Jour ' + dayNum + ' · Verset ' + dayNum + '/40';
+  document.getElementById('progressFill').style.width = progress + '%';
+  document.getElementById('progressLabel').textContent = dayNum + '/40';
+
+  if (isReadToday()) {
+    showSuccess(verse);
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+init();
+</script>
+</body>
+</html>

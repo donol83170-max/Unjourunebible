@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible First - Status API</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #ffffff;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    #status-output {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #111111;
+      text-align: center;
+      word-break: break-all;
+      margin-bottom: 32px;
+    }
+
+    .instruction {
+      font-size: 0.85rem;
+      color: #666666;
+      text-align: center;
+      max-width: 420px;
+      line-height: 1.6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="status-output">Chargement...</div>
+  <p class="instruction">Utilisez cette URL dans vos Raccourcis iOS pour vérifier si la lecture du jour est validée.</p>
+
+  <script>
+    (function () {
+      function getTodayString() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        return yyyy + '-' + mm + '-' + dd;
+      }
+
+      const today = getTodayString();
+      const lastRead = localStorage.getItem('bible_read_date') || '';
+      const isRead = lastRead === today;
+
+      const output = JSON.stringify({ isRead: isRead, date: today });
+      document.getElementById('status-output').textContent = output;
+      document.title = 'Bible First - Status API';
+    })();
+  </script>
+</body>
+</html>
