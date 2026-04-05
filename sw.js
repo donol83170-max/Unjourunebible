@@ -1,4 +1,4 @@
-const CACHE_NAME    = 'bible-pwa-v2';
+const CACHE_NAME    = 'bible-pwa-v3';
 const SETTINGS_KEY  = 'bible-settings-v1';
 const ASSETS = [
   '/Unjourunebible/',
