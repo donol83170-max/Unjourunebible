@@ -2,7 +2,7 @@
   "name": "Un jour, un verset",
   "short_name": "Un jour, un verset",
   "description": "Un verset biblique chaque jour",
-  "start_url": "/",
+  "start_url": "/Unjourunebible/",
   "display": "standalone",
   "background_color": "#FAFAF2",
   "theme_color": "#3797A4",
