@@ -304,27 +304,62 @@ body::before{
 <div class="modal-overlay" id="modalTuto" onclick="if(event.target===this)closeTuto()">
   <div class="modal">
     <h3>📲 Installer l'app</h3>
-    <p>Dans <strong>Safari</strong>, suis ces 3 étapes :</p>
-    <div class="tuto-steps">
-      <div class="tuto-step">
-        <div class="tuto-num">1</div>
-        <div class="tuto-icon">⎙</div>
-        <div class="tuto-text">Appuie sur l'icône <strong>Partager</strong> en bas de Safari</div>
-      </div>
-      <div class="tuto-arrow">↓</div>
-      <div class="tuto-step">
-        <div class="tuto-num">2</div>
-        <div class="tuto-icon">⋯</div>
-        <div class="tuto-text">Fais défiler et appuie sur <strong>Voir plus</strong></div>
-      </div>
-      <div class="tuto-arrow">↓</div>
-      <div class="tuto-step">
-        <div class="tuto-num">3</div>
-        <div class="tuto-icon">＋</div>
-        <div class="tuto-text">Appuie sur <strong>Sur l'écran d'accueil</strong> puis <strong>Ajouter</strong></div>
+
+    <!-- Onglets -->
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button id="tabIos" onclick="switchTab('ios')" style="flex:1;padding:9px;border-radius:10px;font-size:.82rem;font-weight:700;font-family:sans-serif;cursor:pointer;background:#3797A4;color:#fff;border:none">iPhone (Safari)</button>
+      <button id="tabAndroid" onclick="switchTab('android')" style="flex:1;padding:9px;border-radius:10px;font-size:.82rem;font-weight:700;font-family:sans-serif;cursor:pointer;background:rgba(55,151,164,0.08);color:#3797A4;border:1px solid rgba(155,205,205,0.4)">Android (Chrome)</button>
+    </div>
+
+    <!-- iOS -->
+    <div id="panelIos">
+      <p>Dans <strong>Safari</strong>, suis ces 3 étapes :</p>
+      <div class="tuto-steps">
+        <div class="tuto-step">
+          <div class="tuto-num">1</div>
+          <div class="tuto-icon">⎙</div>
+          <div class="tuto-text">Appuie sur l'icône <strong>Partager</strong> en bas de Safari</div>
+        </div>
+        <div class="tuto-arrow">↓</div>
+        <div class="tuto-step">
+          <div class="tuto-num">2</div>
+          <div class="tuto-icon">⋯</div>
+          <div class="tuto-text">Fais défiler et appuie sur <strong>Voir plus</strong></div>
+        </div>
+        <div class="tuto-arrow">↓</div>
+        <div class="tuto-step">
+          <div class="tuto-num">3</div>
+          <div class="tuto-icon">＋</div>
+          <div class="tuto-text">Appuie sur <strong>Sur l'écran d'accueil</strong> puis <strong>Ajouter</strong></div>
+        </div>
       </div>
     </div>
-    <p style="font-size:.78rem;color:#9BCDCD;text-align:center">L'app apparaît sur ton écran d'accueil comme une vraie application.</p>
+
+    <!-- Android -->
+    <div id="panelAndroid" style="display:none">
+      <p>Dans <strong>Chrome</strong>, suis ces 3 étapes :</p>
+      <div class="tuto-steps">
+        <div class="tuto-step">
+          <div class="tuto-num">1</div>
+          <div class="tuto-icon">⋮</div>
+          <div class="tuto-text">Appuie sur les <strong>3 points</strong> en haut à droite de Chrome</div>
+        </div>
+        <div class="tuto-arrow">↓</div>
+        <div class="tuto-step">
+          <div class="tuto-num">2</div>
+          <div class="tuto-icon">＋</div>
+          <div class="tuto-text">Appuie sur <strong>"Ajouter à l'écran d'accueil"</strong></div>
+        </div>
+        <div class="tuto-arrow">↓</div>
+        <div class="tuto-step">
+          <div class="tuto-num">3</div>
+          <div class="tuto-icon">✓</div>
+          <div class="tuto-text">Appuie sur <strong>"Installer"</strong> pour confirmer</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:.78rem;color:#9BCDCD;text-align:center;margin-top:8px">L'app apparaît sur ton écran d'accueil comme une vraie application.</p>
     <button class="modal-btn modal-close" onclick="closeTuto()">Compris !</button>
   </div>
 </div>
@@ -412,11 +447,24 @@ function resetStartDate() {
 }
 
 function openTuto() {
+  switchTab('ios');
   document.getElementById('modalTuto').classList.add('open');
 }
 
 function closeTuto() {
   document.getElementById('modalTuto').classList.remove('open');
+}
+
+function switchTab(tab) {
+  var isIos = tab === 'ios';
+  document.getElementById('panelIos').style.display     = isIos ? 'block' : 'none';
+  document.getElementById('panelAndroid').style.display = isIos ? 'none' : 'block';
+  document.getElementById('tabIos').style.background      = isIos ? '#3797A4' : 'rgba(55,151,164,0.08)';
+  document.getElementById('tabIos').style.color           = isIos ? '#fff' : '#3797A4';
+  document.getElementById('tabIos').style.border          = isIos ? 'none' : '1px solid rgba(155,205,205,0.4)';
+  document.getElementById('tabAndroid').style.background  = isIos ? 'rgba(55,151,164,0.08)' : '#3797A4';
+  document.getElementById('tabAndroid').style.color       = isIos ? '#3797A4' : '#fff';
+  document.getElementById('tabAndroid').style.border      = isIos ? '1px solid rgba(155,205,205,0.4)' : 'none';
 }
 
 function openHelp() {
